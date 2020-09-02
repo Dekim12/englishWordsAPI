@@ -1,14 +1,11 @@
-import * as express from "express";
+import Application from './app';
 
-import appRouter from "./routes";
+const options = {
+  host: 'localhost',
+  port: 8080,
+  dbConnectionUrl: '',
+};
 
-const app = express();
-const port = 8080;
+const app = new Application(options);
 
-app.use(express.json());
-
-app.use("/words", appRouter);
-
-app.listen(port, (err) => {
-  console.log(`server is listening on ${port}`);
-});
+app.run();
