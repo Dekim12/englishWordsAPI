@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { MongoClient } from 'mongodb';
 
-import appRouter from './routes';
+import {wordsRouter} from './routes';
 
 interface AppOptions {
   host: string;
@@ -24,7 +24,7 @@ export default class Application {
 
   private configure(): void {
     this.server.use(express.json());
-    this.server.use('/words', appRouter);
+    this.server.use('/words', wordsRouter);
   }
 
   private connectToDB(): void {
