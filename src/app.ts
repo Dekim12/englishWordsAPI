@@ -1,7 +1,7 @@
-import * as express from 'express';
-import { MongoClient } from 'mongodb';
+import * as express from "express";
+import { MongoClient } from "mongodb";
 
-import {wordsRouter} from './routes';
+import { wordsRouter } from "./routes";
 
 interface AppOptions {
   host: string;
@@ -12,19 +12,19 @@ interface AppOptions {
 export default class Application {
   private server: express.Application;
   private serverInstance: any;
-  private static dbConnection: MongoClient;
+  private static dbConnection: any;
 
   constructor(private options: AppOptions) {
     this.server = express();
   }
 
-  public static get getDbConnection(): MongoClient {
+  public static get getDbConnection(): any {
     return Application.dbConnection;
   }
 
   private configure(): void {
     this.server.use(express.json());
-    this.server.use('/words', wordsRouter);
+    this.server.use("/words", wordsRouter);
   }
 
   private connectToDB(): void {
@@ -32,7 +32,6 @@ export default class Application {
 
     MongoClient.connect(dbConnectionUrl, { useUnifiedTopology: true })
       .then((client) => {
-        console.log('Connected!');
         Application.dbConnection = client.db();
       })
       .catch((err) => console.log(err));
@@ -50,6 +49,6 @@ export default class Application {
   }
 
   public stop(): void {
-    this.serverInstance.close(() => console.log('server was stopped'));
+    this.serverInstance.close(() => console.log("server was stopped"));
   }
 }

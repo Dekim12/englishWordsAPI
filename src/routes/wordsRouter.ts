@@ -1,11 +1,15 @@
 import { Router } from "express";
 
-import { getWordsList, addWord } from "../controllers";
+import { getWordsList, addWord, updateWord, removeWord} from "../controllers/words";
 
 const wordsRouter = Router();
 
 wordsRouter.get("/list", getWordsList);
 
-wordsRouter.post("/addWord",addWord);
+wordsRouter.post("/add", addWord);
+
+wordsRouter.put("/update", updateWord);
+
+wordsRouter.delete("/remove", removeWord);
 
 export {wordsRouter};

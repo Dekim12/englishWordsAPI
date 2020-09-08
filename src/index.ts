@@ -1,9 +1,9 @@
-import Application from './app';
+import Application from "./app";
 
 const options = {
-  host: 'localhost',
+  host: "localhost",
   port: 8080,
-  dbConnectionUrl: '',
+  dbConnectionUrl: process.env.DB_CONNECTION_URL!,
 };
 
 const app = new Application(options);
