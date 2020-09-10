@@ -25,6 +25,14 @@ export default class Application {
   private configure(): void {
     this.server.use(express.json());
     this.server.use("/words", wordsRouter);
+
+    this.server.use((err, req, res, next) => {
+      if (err.statusCode) {
+        res.status(err.statusCode).json(err.data);
+      } else {
+        res.send(err);
+      }
+    });
   }
 
   private connectToDB(): void {
@@ -33,6 +41,7 @@ export default class Application {
     MongoClient.connect(dbConnectionUrl, { useUnifiedTopology: true })
       .then((client) => {
         Application.dbConnection = client.db();
+        console.log("Connect!");
       })
       .catch((err) => console.log(err));
   }

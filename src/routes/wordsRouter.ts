@@ -1,6 +1,11 @@
 import { Router } from "express";
 
-import { getWordsList, addWord, updateWord, removeWord} from "../controllers/words";
+import {
+  getWordsList,
+  addWord,
+  updateWord,
+  removeWord,
+} from "../controllers/words";
 
 const wordsRouter = Router();
 
@@ -12,4 +17,4 @@ wordsRouter.put("/update", updateWord);
 
 wordsRouter.delete("/remove", removeWord);
 
-export {wordsRouter};
+export { wordsRouter };
