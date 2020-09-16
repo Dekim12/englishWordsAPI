@@ -7,7 +7,7 @@ import {
   removeWord,
 } from "../controllers/words";
 
-const wordsRouter = Router();
+const wordsRouter: Router = Router();
 
 wordsRouter.get("/list", getWordsList);
 

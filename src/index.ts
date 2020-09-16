@@ -1,11 +1,11 @@
-import Application from "./app";
+import Application, { AppOptions, AppInterface } from "./app";
 
-const options = {
+const options: AppOptions = {
   host: "localhost",
   port: 8080,
   dbConnectionUrl: process.env.DB_CONNECTION_URL!,
 };
 
-const app = new Application(options);
+const app: AppInterface = new Application(options);
 
 app.run();

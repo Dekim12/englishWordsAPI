@@ -14,7 +14,7 @@
     "inlineSources": true,
     "noUnusedLocals": false,
     "strictNullChecks": true,
-    "outDir": "dist/",
+    "outDir": "./dist",
     "lib": ["dom", "es6", "es2016.array.include", "es2017"],
     "typeRoots": ["./node_modules/@types"]
   },

@@ -1,24 +1,30 @@
 import * as express from "express";
-import { MongoClient } from "mongodb";
+import { Server } from "http";
+import { MongoClient, Db } from "mongodb";
 
 import { wordsRouter } from "./routes";
 
-interface AppOptions {
-  host: string;
-  port: number;
-  dbConnectionUrl: string;
+export interface AppOptions {
+  readonly host: string;
+  readonly port: number;
+  readonly dbConnectionUrl: string;
 }
 
-export default class Application {
+export interface AppInterface {
+  run(): void;
+  stop(): void;
+}
+
+export default class Application implements AppInterface {
   private server: express.Application;
-  private serverInstance: any;
-  private static dbConnection: any;
+  private serverInstance: Server;
+  private static dbConnection: Db;
 
   constructor(private options: AppOptions) {
     this.server = express();
   }
 
-  public static get getDbConnection(): any {
+  public static get getDbConnection(): Db {
     return Application.dbConnection;
   }
 
@@ -35,15 +41,19 @@ export default class Application {
     });
   }
 
-  private connectToDB(): void {
+  private async connectToDB(): Promise<void> {
     const { dbConnectionUrl } = this.options;
 
-    MongoClient.connect(dbConnectionUrl, { useUnifiedTopology: true })
-      .then((client) => {
-        Application.dbConnection = client.db();
-        console.log("Connect!");
-      })
-      .catch((err) => console.log(err));
+    try {
+      const client: MongoClient = await MongoClient.connect(dbConnectionUrl, {
+        useUnifiedTopology: true,
+      });
+
+      Application.dbConnection = client.db();
+      console.log("Connect!");
+    } catch (err) {
+      console.log("DB connection error!", err);
+    }
   }
 
   public run(): void {
