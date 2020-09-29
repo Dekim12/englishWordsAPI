@@ -1,17 +1,13 @@
 import {
   ObjectId,
-  Collection,
   InsertOneWriteOpResult,
   FindAndModifyWriteOpResultObject,
   DeleteWriteOpResultObject,
 } from "mongodb";
 
-import Application from "../app";
+import { getCollection } from "../utils";
 
 const COLLECTION: string = "words";
-
-const getCollection = (): Collection =>
-  Application.getDbConnection.collection(COLLECTION);
 
 export interface WordInterface {
   save(): Promise<InsertOneWriteOpResult<any>>;
@@ -35,23 +31,26 @@ export default class Word implements WordInterface {
     this.translates = translates || [];
   }
 
-  public static find(value?: string) {
-    return getCollection().findOne({ value });
+  public static find(value?: string): Promise<any> {
+    return getCollection(COLLECTION).findOne({ value });
   }
 
   public static getAll(): Promise<any[]> {
-    return getCollection().find().toArray();
+    return getCollection(COLLECTION).find().toArray();
   }
 
   public static remove(id: string): Promise<DeleteWriteOpResultObject> {
-    return getCollection().deleteOne({ _id: new ObjectId(id) });
+    return getCollection(COLLECTION).deleteOne({ _id: new ObjectId(id) });
   }
 
   public save() {
-    return getCollection().insertOne(this);
+    return getCollection(COLLECTION).insertOne(this);
   }
 
   public update() {
-    return getCollection().findOneAndUpdate({ _id: this._id }, { $set: this });
+    return getCollection(COLLECTION).findOneAndUpdate(
+      { _id: this._id },
+      { $set: this }
+    );
   }
 }

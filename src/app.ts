@@ -1,8 +1,10 @@
 import * as express from "express";
 import { Server } from "http";
 import { MongoClient, Db } from "mongodb";
+import * as passport from "passport";
 
-import { wordsRouter } from "./routes";
+import initPassport from "./auth/passport";
+import { wordsRouter, authRouter } from "./routes";
 
 export interface AppOptions {
   readonly host: string;
@@ -29,8 +31,19 @@ export default class Application implements AppInterface {
   }
 
   private configure(): void {
+    initPassport(passport);
+    this.server.use(passport.initialize());
+
     this.server.use(express.json());
+    this.server.use("/user", authRouter);
     this.server.use("/words", wordsRouter);
+
+    this.server.get(
+      "/user/protected",
+      passport.authenticate("jwt", { session: false }, (req, res, next) =>
+        res.status(200).json({ message: "Passport works" })
+      )
+    );
 
     this.server.use((err, req, res, next) => {
       if (err.statusCode) {
