@@ -1,10 +1,9 @@
-import * as express from "express";
-import { Server } from "http";
-import { MongoClient, Db } from "mongodb";
-import * as passport from "passport";
+import * as express from 'express';
+import { Server } from 'http';
 
-import initPassport from "./auth/passport";
-import { wordsRouter, authRouter } from "./routes";
+import connectToDB from './db';
+import { wordsRouter } from './resources';
+import { errorHandler, Error404 } from './errors';
 
 export interface AppOptions {
   readonly host: string;
@@ -20,67 +19,41 @@ export interface AppInterface {
 export default class Application implements AppInterface {
   private server: express.Application;
   private serverInstance: Server;
-  private static dbConnection: Db;
 
   constructor(private options: AppOptions) {
     this.server = express();
   }
 
-  public static get getDbConnection(): Db {
-    return Application.dbConnection;
-  }
-
   private configure(): void {
-    initPassport(passport);
-    this.server.use(passport.initialize());
-
     this.server.use(express.json());
-    this.server.use("/user", authRouter);
-    this.server.use("/words", wordsRouter);
-
-    this.server.get(
-      "/user/protected",
-      passport.authenticate("jwt", { session: false }, (req, res, next) =>
-        res.status(200).json({ message: "Passport works" })
-      )
+    this.server.use('/words', wordsRouter);
+    this.server.use((req: express.Request, res: express.Response, next: express.NextFunction) =>
+      next(new Error404('Incorrect URL!'))
     );
 
-    this.server.use((err, req, res, next) => {
-      if (err.statusCode) {
-        res.status(err.statusCode).json(err.data);
-      } else {
-        res.send(err);
-      }
-    });
+    this.server.use(errorHandler);
   }
 
-  private async connectToDB(): Promise<void> {
-    const { dbConnectionUrl } = this.options;
-
-    try {
-      const client: MongoClient = await MongoClient.connect(dbConnectionUrl, {
-        useUnifiedTopology: true,
-      });
-
-      Application.dbConnection = client.db();
-      console.log("Connect!");
-    } catch (err) {
-      console.log("DB connection error!", err);
-    }
-  }
-
-  public run(): void {
+  private async startServer(): Promise<void> {
     const { host, port } = this.options;
 
-    this.connectToDB();
     this.configure();
 
     this.serverInstance = this.server.listen(port, host, () => {
-      console.log(`server is listening on ${port}`);
+      console.log(`Server is listening on ${port}`);
     });
   }
 
+  public run(): void {
+    const { dbConnectionUrl } = this.options;
+
+    connectToDB(dbConnectionUrl).then(() => this.startServer());
+  }
+
   public stop(): void {
-    this.serverInstance.close(() => console.log("server was stopped"));
+    this.serverInstance.close(() => {
+      console.log('server was stopped');
+      process.exit(0);
+    });
   }
 }

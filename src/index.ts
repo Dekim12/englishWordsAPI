@@ -1,9 +1,10 @@
-import Application, { AppOptions, AppInterface } from "./app";
+import Application, { AppOptions, AppInterface } from './app';
+import config from './common/config';
 
 const options: AppOptions = {
-  host: "localhost",
-  port: 8080,
-  dbConnectionUrl: process.env.DB_CONNECTION_URL!,
+  host: config.host,
+  port: config.port,
+  dbConnectionUrl: config.dbConnectionUrl,
 };
 
 const app: AppInterface = new Application(options);
